@@ -25,15 +25,12 @@ class JiebaTokenizer(Tokenizer):
     def cut(self, sentence, pos=True):
         if pos:
             pairs = pseg.cut(sentence)
-            tok = []
-
-            for p in pairs:
-                w = p.word.strip()
-                if len(w) > 0:
-                    tok.append(Word(w, pos=p.flag))
-            return tok
+            toks = [Word(p.word, pos=p.flag) for p in pairs]
+            return toks
         else:
-            return [Word(w.strip()) for w in jieba.cut(sentence) if bool(w.strip())]
+            words = jieba.cut(sentence)
+            toks = [Word(w) for w in words]
+            return toks
 
 
 class OpenCCTokenizer(Tokenizer):
@@ -43,14 +40,12 @@ class OpenCCTokenizer(Tokenizer):
 
     def cut(self, sentence, pos=True):
         simplified = opencc.convert(sentence, config='tw2s.json')
-
         tokenized = self.tokenizer(simplified, pos=pos)
-
         recovered = []
         head = 0
         for tok in tokenized:
             l = len(tok.word)
-            recovered.append(Word(sentence[head : head + l], pos=tok.pos))
+            recovered.append(Word(sentence[head: head + l], pos=tok.pos))
             head += l
         return recovered
 
