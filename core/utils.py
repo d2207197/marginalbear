@@ -118,7 +118,8 @@ class PsqlAbstract(object):
     def session(keep=False):
         def _session(func):
             def _wrapper(self, *args, **kwargs):
-                connect = psycopg2.connect(database=PsqlAbstract.db, user=PsqlAbstract.user, password=PsqlAbstract.pw)
+                connect = psycopg2.connect(
+                    database=PsqlAbstract.db, user=PsqlAbstract.user, password=PsqlAbstract.pw)
                 cursor = connect.cursor()
                 ret = func(self, connect, cursor, **kwargs)
                 if not keep:
@@ -135,7 +136,8 @@ class PsqlAbstract(object):
         connect.close()
 
     def _execute(self, sql_string, data):
-        connect = psycopg2.connect(database=PsqlAbstract.db, user=PsqlAbstract.user, password=PsqlAbstract.pw)
+        connect = psycopg2.connect(
+            database=PsqlAbstract.db, user=PsqlAbstract.user, password=PsqlAbstract.pw)
         cursor = connect.cursor()
         cursor.execute(sql_string, data)
         ret = cursor.fetchone()
@@ -152,7 +154,8 @@ class PsqlAbstract(object):
 class PsqlQuery(PsqlAbstract):
 
     def __init__(self, username=None, db=None, password=None):
-        super(self.__class__, self).__init__(username=username, db=db, password=password)
+        super(self.__class__, self).__init__(
+            username=username, db=db, password=password)
         self.schema = {}
 
     def upsert(self, q, data=None):
@@ -303,7 +306,8 @@ def bm25_similarity(vocab, doc, k1=1.5, b=0.75):
 
     def _bm25(v):
         if v['word'] in doc:
-            idf = math.log((doc_num - max(1.0, v['docfreq'])) / max(1.0, v['docfreq']))
+            idf = math.log(
+                (doc_num - max(1.0, v['docfreq'])) / max(1.0, v['docfreq']))
             tf = v['termweight']
             return idf * (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * doc_len / ave_title_len))
         else:
@@ -320,7 +324,8 @@ def pos_jaccard_similarity(vocab, doc):
         if v['word'] in doc and v not in invocab:
             invocab.append(v)
 
-    tfidf = [v['termweight'] * math.log(doc_num / min(1.0, v['docfreq'])) for v in invocab]
+    tfidf = [v['termweight'] *
+             math.log(doc_num / min(1.0, v['docfreq'])) for v in invocab]
     union = set([v['word'] for v in vocab] + doc)
     score = sum(tfidf) / float(len(union))
     return score
